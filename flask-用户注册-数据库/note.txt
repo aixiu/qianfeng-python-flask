@@ -1,0 +1,182 @@
+1.模板
+
+网页 --> 模板引擎处理 --> 模板引擎处理
+       render_templat
+
+语法：
+{{ 变量 }}
+
+{% if 条件 %}{% endif %}
+...
+for, block, macro, with
+
+{% extends '' %}
+{% include '' %}
+{% import '' %}
+{% set username='' %}
+
+过滤器：
+。。
+自定义过滤器
+
+1.通过方法添加
+2.通过装饰器添加
+
+2.蓝图
+
+
+
+插件  flask-script
+安装：pip install flask-script  *
+
+注意：
+ModuleNotFoundError: No module named 'flask._compat'
+
+
+找到源码：  flask_script/__init__.py 文件
+
+目录如：
+D:\Program Files\Python3\Venvs\Venv\Lib\site-packages\flask_script
+
+from flask._compat import text_type
+
+修改为：
+
+from flask_script._compat import text_type
+
+
+源文：https://blog.csdn.net/Deng872347348/article/details/126304487
+https://cloud.tencent.com/developer/ask/sof/1395077/answer/1917251
+
+
+使用里边的 Manager 进行命令得到管理和使用：
+Manager(app=app)
+
+manager.run()  ---> 启动
+在终端使用命令：
+python app.py runserver  --> Runs the Flask development server
+
+python app.py runserver -h 0.0.0.0 -p 5001
+
+本案例用：python ./flask-用户更新/app.py runserver
+
+自定义添加命令：
+
+# 自定义命令，得使用 @manager.command  
+@manager.command
+def init():
+    print('初始化')
+
+ python app.py init   调用
+ 输出： 初始化
+
+
+ 2.数据库：
+ mvt:
+ model  模型  ---> 数据库：
+ template  模板
+ view  视图
+
+ 数据库操作：
+ 增加：insert into
+ 删除：delete from
+ 更新：update ..set
+ 查询：select ..from
+
+ 必须安装：
+ pip install pymysql  *  建公路
+ pip install flask-sqlalchemy  * 实现ORM映射
+ pip install flask-migrate  *  发布命的工具
+
+
+https://zhuanlan.zhihu.com/p/54017111
+
+SQLALCHEMY_DATABASE_URI 数据库的连接信息：
+Postgres:    postgresql://user:password@localhost/mydatabase
+MySQL:       mysql://user:password@localhost/mydatabase
+Oracle:      oracle://user:password@127.0.0.1:1521/sidname
+SQLite （linux,macOS）:   sqlite:////absolute/path/to/foo.db
+SQLite （windows）:   sqlite:///c:/absolute/path/to/foo.db
+
+
+Postgres：postgresql://scott:tiger@localhost/mydatabase
+MySQL：mysql://username:password@host/databasename
+Oracle：oracle://username:password@host/databasename
+SQLite（UNIX）：sqlite:////absolute/path/to/foo.db
+SQLite（内存）：sqlite:///:memory:
+SQLite（Windows）：sqlite:////absolute\\path\\to\\foo.db
+
+步骤：
+1、配置数据库的连接路径
+    # mysql+pymysql(驱动)://user:password@hostip:port/databasename
+    # SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://root:root@127.0.0.1:3306/flask-user'
+    # 配置 SQLite 数据库, 默认存放在 app instance 文件夹下 
+    # 原文：https://www.bilibili.com/read/cv24640972/    https://zhuanlan.zhihu.com/p/54017111
+    SQLALCHEMY_DATABASE_URI = 'sqlite+pymysql:///flask-user.db'#设置数据库URL
+
+    在Flask-SQLAlchemy中通过SQLALCHEMY_DATABASE_URI设置。
+    
+    # SQLite URI compatible
+    WIN = sys.platform.startswith('win')
+    if WIN:
+    prefix = 'sqlite:///'
+    else:
+    prefix = 'sqlite:////'
+
+    app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL', prefix + os.path.join(app.root_path, 'data.db'))
+
+
+2、创建包 ext
+    __init__.py 中添加：
+
+    db.init_app(app=app)  # 将db对象与app进行了关联
+
+    def create_app():
+            ....
+            db.init_app(app=app)
+            return app
+3、migrate:
+    migrate = Migrate(app=app, db=db)
+    manager.add_command('db', MigrateCommand)
+
+4、创建模型：
+    models.py
+
+    模型就是类
+    class User(db.Model):   ----> user 表
+        id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+        username = db.Column(db.String(15), nullable=False)
+        password = db.Column(db.String(12), nullable=False)
+        phone = db.Column(db.String(11), unique=True)
+        rdatetime = db.column(db.DateTime, default=datetime.now)
+
+5、使用命令：
+    a. 敲黑板。。。
+        在app.py中导入模型: from apps.user.model import User
+    b. 在终端使用命令：db
+        python ./flask-用户更新/app.py db init ---> 产生一个文件夹 migrations  只需要运行一次
+        python ./flask-用户更新/app.py db migrate  ---> 迁移 产生一个版本文件  
+        项目：
+            |--- apps
+            |--- ext
+            |--- migrations   python ./flask-用户更新/app.py db init
+                |--- versions 版本文件夹
+                    |--- 4bb46b2bf47f_.py
+                    |--- 495484c80459_.py
+        python ./flask-用户更新/app.py db upgrade  同步  生成数据表，将版本文件最后一个文件生成数据表
+        python ./flask-用户更新/app.py db downgrade  降级 降到当前版本的上一个文件生成数据表
+
+6、添加数据：以注册为例：
+# 模板，视图与模型结合
+
+# 1、找到模型类并创建对象
+user = User()
+# 2、给对象的属性赋值
+user.username = username
+user.password = password
+user.phone = phone
+# 添加
+# 3、将user对象添加到session中
+db.session.aadd(user)
+# 4、提交数据
+db.session.commiit()

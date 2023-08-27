@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block middle %}
+    <h1>用户信息</h1>
+    <span>当前用户人数是: {{ users | length }} 人</span>
+    <table border="1" cellspacing="0" width="30%">
+        {% for user in users %}
+            <tr>
+                <td>{{ loop.index }}</td>
+                <td>{{ user.username }}</td>
+                <td>{{ user.password }}</td>
+                <td>{{ user.phone }}</td>
+                <td>
+                    <!-- javascript:; 取消 href 功能 添加一个单击事件 -->
+                    <a href="javascript:;" onclick="update('{{ user.username}}')">修改</a>
+                    <a href="javascript:;" onclick="del('{{ user.username}}')">删除</a>
+                </td>
+            </tr>
+        {% endfor %}
+    </table>
+{% endblock %}
+
+{% block myjs %}
+    <script>
+        // 删除的函数
+        function del(username) {
+            // console.log(username)  测试是否能获取传递过来的 username
+
+            //location 地址栏对象 location.href就是指的 http://127.0.0.1:5000/
+            location.href = '/del?username=' + username
+        }
+
+        // 修改的函数
+        function update(username) {
+            location.href = '/update?username=' + username
+        }
+    </script>
+{% endblock%}

@@ -1,0 +1,39 @@
+{% extends 'base-模板继承.html'%}
+
+{% block title %}
+    首页
+{% endblock %}
+
+{% block mycss %}
+    <style>
+        #middle{
+            background-color: rgb(226, 245, 205);   
+            color: rgb(20, 140, 220);    
+            font-weight: bold;   
+        }
+        .div1{
+            width: 33.3%;
+            height: 400px;
+            float: left;
+            border: 1px solid red;
+            box-sizing: border-box;
+        }
+    </style>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+{% endblock%}
+
+{% block myjs %}
+    <script>
+        btn = document.getElementById('btn')
+        btn.onclick = function(){
+            alert('别点我')
+        }
+    </script>
+{% endblock %}
+
+{% block middle %}
+    <div class="div1" id="d1"></div>
+    <div class="div1"><button id="btn">我是中间部分</button> </div>
+    <div class="div1"></div>
+    <img src="{{ url_for('static', filename='images/touxiang.png')}}" alt="QQ头像">
+{% endblock %}

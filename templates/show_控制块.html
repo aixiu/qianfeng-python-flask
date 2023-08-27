@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="google" content="notranslate" />
+    <title>控制块演示</title>
+    <style>
+        .a{
+            color: red;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <!-- https://www.bilibili.com/video/BV17z4y1X7UZ/?p=11&spm_id_from=pageDriver&vd_source=20f7c1f5f32f90ae92d9428e45039d9b  30分钟左右 -->  
+    {# ul...li #}   <!-- 这也是模板注释写法 -->  
+    {# ol...li #}
+
+    <!-- <button> 按钮 </button> -->
+    {# {{ girls }} #}
+
+    <ul style="list-style-type: none;">
+        {% for girl in girls %}
+            <li> {{ girl }} </li>
+        {% endfor %}
+    </ul>
+
+    <hr>
+
+    <ul style="list-style-type: none;">        
+        {% for girl in girls %}
+            {% if girl|length >= 3 %}
+                <li class="a"> {{ girl }}</li>
+            {% else %}
+                <li> {{ girl }} </li> 
+            {% endif %}
+        {% endfor %}
+    </ul>
+
+    <hr>
+
+    <table border="1"  cellpadding="5" cellspacing="0" width="30%">        
+        <tr>
+            <th>username</th>
+            <th>password</th>
+            <th>addr</th>
+            <th>phone</th>
+        </tr>
+
+        {% for user in users %}
+            <tr>
+                <td> {{ user.username }} </td>
+                <td> {{ user.password }} </td>
+                <td> {{ user.addr }} </td>
+                <td> {{ user.phone }} </td>
+            </tr>
+        {% endfor %}
+    </table>
+
+    <hr>
+
+    <table border="1" cellpadding="5" cellspacing="0" width="30%">
+        {% for user in users %}
+            <tr {% if loop.last %} style="background-color: darkgray;" {% endif %}>
+                <td> {{ loop.index }} </td>
+                <td> {{ user.username }} </td>
+                <td> {{ user.password }} </td>
+                <td> {{ user.addr }} </td>
+                <td> {{ user.phone }} </td>
+            </tr>
+        {% endfor %}
+    </table>
+
+</body>
+</html>

@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="google" content="notranslate">
+    <title>{% block title %} 用户中心 {% endblock %}</title>
+    <style>
+        #head{
+            height: 50px;
+            background-color: rgb(252, 219, 178);
+        }
+        #head ul{
+            list-style: none;
+            height: 50px;
+        }
+        #head ul li{
+            float: left;
+            width:  100px;
+            text-align: center;
+            font-size: 18px;
+            height: 50px;
+            line-height: 50px;
+        }
+        #middle{
+            height: 800px;
+            background-color: rgb(228, 212, 241);          
+        }
+        #foot{
+            height: 50px;
+            line-height: 50px;
+            background-color: rgb(162, 225, 236);
+        }
+    </style>
+    {% block mycss %}{% endblock %}
+</head>
+<body>
+    <div id="head">
+        <ul>
+            <li><a href="">首页</a></li>
+            <li><a href="">秒杀</a></li>
+            <li><a href="">超市</a></li>
+            <li><a href="">图书</a></li>
+            <li><a href="">会员</a></li>
+        </ul>
+    </div>
+    <div id="middle">
+        {% block middle %}{% endblock %}
+    </div>
+    <div id="foot"></div>
+    {% block myjs %}{% endblock %}
+</body>
+</html>

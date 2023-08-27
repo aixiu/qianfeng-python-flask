@@ -1,0 +1,269 @@
+1、模板：
+
+{{ list.0 }}  同 {{ list[0] }}
+{{ dict.key }}  同 {{ dict.get(key) }}
+{{ girl.name }}  同 {{ 对象.属性 }}
+
+2、控制块
+
+{% if 条件 %}
+    .....
+{% endif%}
+
+============================
+
+{% if 条件 %}
+    条件为True
+{% elst %}
+    条件为False
+{% endif%}
+
+============================
+
+{% for 变量 in 可迭代的对象 %}
+    for 循环要做的任务
+{% endfor%}
+
+可以使用 loop 变量
+loop.index  序号从1开始
+loop.index0  序号从0开始
+
+loop.revindex  reverse 序号反转
+loop.revindex0 从0反转
+
+loop.first 布尔类型 是否是第一行
+loop.last 布尔类型 是否是最后一行
+
+3、过滤器
+过滤器的本质就是函数
+
+模板语法中使用过滤器：
+{{ 变量 | 过滤器(*args) }}  传参
+{{ 变量 | 过滤器(*args) }}  无参
+
+常见的过滤器：
+1.safe: 禁用转义
+如：{{ msg | safe}}
+msg = '<h1>520快乐！</h1>'
+return render_template('show_过滤器.html', msg=msg)
+不让其转义：
+{{ msg | safe}}
+
+2、capitalize  首字母大小
+{{ n1 | capitalize}}
+
+3、upper 全大写 lower 全小写
+大写小转换
+
+4、title 一句话中每个单词的首字母大写
+msg = 'she is a beautifull firl'
+{{ msg | title }}
+
+5、reverse 反转
+{{ n1 | reverse }}
+
+6、format 格式化 带参数
+{{ '%s is %d years old' | format('lily', 18) }}
+
+7、truncate 字符串截断
+
+
+list 列表的过滤器
+{{ girls | first }} <br>
+{{ girls | last }} <br>
+{{ girls | length }} <br>
+{{ [1, 3, 5, 7, 9] | sum }} 求和
+{{ [1, 8, 5, 7, 3] | sort }} 排序
+
+dict 字典的过滤器
+
+{{ users.0 }} <br>
+{% for v in users.0.values() %}   取值
+    <p>{{ v }}</p>
+{% endfor%}
+
+<hr>
+
+{% for k in users.0.keys() %}  取键
+    <p>{{ k }}</p>
+{% endfor %}
+
+<hr>
+
+{% for k,v in users.0.items() %}  取键值对
+    <p>{{ k }} --- {{ v }}</p>
+{% endfor %}
+
+
+============================
+自定义过滤器
+# 过滤器本质就是函数
+1.通过flask模块中的 add_template_filter 方法
+2.使用装饰器完成
+
+自定义过滤器（两种方式）
+自定义过滤器的名称如果和内置的过滤器重名，会覆盖内置的过滤器
+
+1、通过add_template_filter（过滤器函数，模板中使用过滤器名字）
+#自定义过滤器
+def list_step_2(li):
+    return li[::2]
+
+#注册过滤器
+#第一个参数是函数名，第二个是过滤器的名字，可在所有模板上使用
+app.add_template_filter(list_step_2, 'list_step')
+
+2、通过装饰器app.template_filter（模板中使用的装饰器的名字）
+
+#自定义过滤器
+@app.template_filter('list_step')
+def list_step_2(li):
+    return li[::2]
+
+原文链接：https://blog.csdn.net/qq_41706810/article/details/105737937
+
+总结：
+1.通过flask模块中的 add_template_filter（过滤器函数，模板中使用过滤器名字）
+    a.定义函数，带有参数和返回值
+    b.添加过滤器 app.add_template_filter(function, name='')
+    c.在模板中使用：{{ 变量 | 自定义过滤器}}
+2.使用装饰器完成
+    a.定义函数，带有参数和返回值
+    b.添加过滤器 @add_template_filter('过滤器的名字')装饰步骤一的函数
+    c.在模板中使用：{{ 变量 | 自定义过滤器}}
+
+
+============================
+
+模板：复用
+1.模板继承 * 重点
+2.imclude
+3.宏
+
+模板继承：
+需要模板继承的情况：
+1.多个模板具有完全相同的顶部和底部
+2.多个模板具有相同的模板内容，但是内容中部分不一样
+3.多个模板具有完全相同的模板内容
+
+用到的标签：
+{% block 名字 %}
+    ....
+{% endblock %}
+
+1.定义父模板
+2.子模板继承父模板
+
+步骤：
+父模板：
+1.定义一个base.html模板
+2.分析模板中哪些是变化的比如：
+    {% block title %}父模板的title{% endblock %}
+    对变化的部分用 block 进行预留位置，也叫：挖坑。
+3.注意：样式和脚本，需提前预留
+    {% block mycss %}{% endblock %}
+    {% block myjs %}{% endblock %}
+
+子使用父模板：
+1.{% extends '父模板的名称'%} 将父 模板继承过来
+2.找到对应的 block (坑) 填充。每一个 block 都是有名字的
+
+
+include:包含
+在A,B,C页面都共同的部分，但是其它页面没有这部分。
+这个时候考虑使用 include
+
+步骤：
+1.先定一个公共的模板部分，xxx.html
+2.谁使用则 include 过来
+    {% include '文件/xxx.html' %}
+
+
+宏：macro
+1.把它看做是jinja2的一个函数，这个函数可以返回一个 HTML 字符串
+2.目的：代码可以复用，避免代码冗余
+
+两种定义方式：
+1.在模板中直接定义和使用：
+    {# 定义宏 #}
+    {% macro form(action, value='登录', method='post') %}
+        <form action="{{ action }} method={{ method }}">
+            <p><input type="text" placeholder="用户名" name="username"></p>
+            <p><input type="password" placeholder="密码" name="password"></p>
+            <p><input type="submit" value="{{ value }}"></p>
+        </form>        
+    {% endmacro %}   
+    
+    {# 调用宏 #}
+    {{ form('/') }}
+
+2.将所有的宏定义在单独的模板中：
+    {# 定义宏 #}
+    {% macro form(action, value='登录', method='post') %}
+        <form action="{{ action }} method={{ method }}">
+            <p><input type="text" placeholder="用户名" name="username"></p>
+            <p><input type="password" placeholder="密码" name="password"></p>
+            <p><input type="submit" value="{{ value }}"></p>
+        </form>        
+    {% endmacro %}
+
+    哪里想使用，就在哪里导入 
+
+    {# 导入宏文件 #}
+    {% import 'macro/macro.html' as f %}
+    导入宏文件并起个别名
+
+    使用：
+    {# 宏使用 #}
+    {{ f.form('/welcome', value='注册') }}
+
+    表现形式如下：
+    {{ xxx.宏名字(参数)}}
+
+
+
+声明变量：
+
+{# 声明变量-全局变量 #}
+{% set username='zhangsan' %}
+{{ username }}
+
+<br>
+
+{# 声明变量-局部变量 #}
+{% with num=1000 %}
+    {{ num }}
+{% endwith %}
+
+
+总结：
+
+变量： {{ 变量 }}
+
+块：
+{% if 条件 %} .... {% endif %}
+{% for 条件 %} .... {% endfor %}
+{% block 条件 %} .... {% endblock %}
+{% macro 条件 %} .... {% endmacro %}
+
+{% include '' %}  包含一个模板
+{% import '' %}  导入宏
+{% extends '' %}  模板继承
+
+{{ url_for('static', filename='') }}
+{{ 宏名('static', filename='') }}
+
+
+view:
+@app.route('/', endpoint='', methods=['GET', 'POST'])
+def index():
+    直接使用 request
+    return response | '' | render_template('xxx.html')
+
+template:
+    模板的语法
+
+model:
+
+
+

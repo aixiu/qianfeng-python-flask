@@ -1,0 +1,8 @@
+{# 定义宏-所有的宏都放在一个文件，其它文件要用，需提前导入 #}
+{% macro form(action, value='登录', method='post') %}
+    <form action="{{ action }}" method="{{ method }}">
+        <p><input type="text" placeholder="用户名" name="username"></p>
+        <p><input type="password" placeholder="密码" name="password"></p>
+        <p><input type="submit" value="{{ value }}"></p>
+    </form>        
+{% endmacro %}
