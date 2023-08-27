@@ -60,7 +60,10 @@ user_list9 = User.query.filter(User.username.contains('g')).order_by(-User.reate
 
 如果有50条记录，10条显示一页就要用 limit限制
 
-
+# 限制 limit + offset
+    user_list10 = User.query.limit(2).all()  # 默认获取两条
+    # 如果拿3.4 得用 offset(2).limit(2) 跳过（偏移）两个记录再取两个记录
+    user_list11 = User.query.offset(2).limit(2).all()
 
 
 总结：
@@ -84,5 +87,9 @@ user_list9 = User.query.filter(User.username.contains('g')).order_by(-User.reate
         and_, or_
     非的条件：
         not_
+    排序：
+        order_by()
+    获取指定数量：
+        limit().offset()
 4、User.query.filter_by()
 

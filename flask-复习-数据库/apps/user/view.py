@@ -107,8 +107,8 @@ def user_select():
     user_list9 = User.query.filter(User.username.contains('g')).order_by(-User.reatetime).all()
     
     # 限制 limit + offset
-    user_list10 = User.query.limit(2).all()  # 拿 1.2
-    # 如果拿3.4 得用 offset(2).limit(2) 偏移两个再取两个
+    user_list10 = User.query.limit(2).all()  # 默认获取两条
+    # 如果拿3.4 得用 offset(2).limit(2) 跳过（偏移）两个记录再取两个记录
     user_list11 = User.query.offset(2).limit(2).all()
     
     
