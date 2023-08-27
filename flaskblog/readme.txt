@@ -1,3 +1,7 @@
+模板和模型的参照：
+https://jinja.palletsprojects.com/en/2.11.x/templates/#super-bLocks
+https://jinja.palletsprojects.com/en/3.0.x/templates/#super-bLocks
+
 1、查询
 查询所有： 模型类.query.all()   ==> select * from user;
 
