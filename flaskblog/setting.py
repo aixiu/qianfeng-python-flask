@@ -13,7 +13,7 @@ class Config:
     # SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://root:root@127.0.0.1:3306/flask-user'
     # 配置 SQLite 数据库, 默认存放在 app instance 文件夹下 
     # 原文：https://www.bilibili.com/read/cv24640972/    https://zhuanlan.zhihu.com/p/54017111
-    SQLALCHEMY_DATABASE_URI = 'sqlite:///flask-user.db'#设置数据库URL
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///flask-blog.db'#设置数据库URL
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SQLALCHEMY_ECHO = True
     

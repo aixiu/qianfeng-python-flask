@@ -6,6 +6,7 @@
 from flask_migrate import Migrate
 # from flask_script import Manager  # 高版本已不再使用
 from apps.user.models import User  # 一定要导入模型模块
+from apps.article.models import Article # 一定要导入模型模块
 from apps import create_app
 from exts import db
 
@@ -29,3 +30,7 @@ migrate = Migrate(app=app, db=db)
 #  运行命令 python ./app.py
 if __name__ == '__main__':
     app.run()
+    
+    
+# 一对多关系 文档 http://www.pythondoc.com/flask-sqlalchemy/models.html#one-to-many
+# flask_sqlalchemy数据库的外键与连接  https://blog.csdn.net/gaoke11240/article/details/120555953

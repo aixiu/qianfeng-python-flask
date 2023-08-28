@@ -33,7 +33,7 @@
                         <th>{{ user.username }}</th>
                         <!-- <th>{{ user.password }}</th> -->
                         <th>{{ user.phone }}</th>
-                        <th>{{ user.reatetime.strftime("%Y-%m-%d %H:%M:%S") }}</th>  <!-- 格式化时间，去掉毫秒 -->                        
+                        <th>{{ user.rdatetime.strftime("%Y-%m-%d %H:%M:%S") }}</th>  <!-- 格式化时间，去掉毫秒 -->                        
                         <th>
                             <a href="{{ url_for('user.update') }}?id={{ user.id }}">更新</a>
                             <a href="{{ url_for('user.delete') }}?id={{ user.id }}">删除</a>
