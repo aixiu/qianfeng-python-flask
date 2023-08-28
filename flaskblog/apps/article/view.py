@@ -5,6 +5,7 @@ from exts import db
 
 article_bp = Blueprint('article', __name__)
 
+# 发布文章
 @ article_bp.route('/publish', methods=['GET', 'POST'], endpoint='publish_article')
 def publish_article():
     if request.method == 'POST':
@@ -28,3 +29,16 @@ def publish_article():
     else:
         users = User.query.filter(User.isdelete == False).all()
         return render_template('article/add_article.html', users=users)
+    
+# 展示文章，根据文章找作者
+@article_bp.route('/all')
+def all_article():
+    articles = Article.query.all()
+    return render_template('article/all.html', articles=articles)
+
+# 展示文章，根据作者找文章  http://127.0.0.1:5000/all1?id=1
+@article_bp.route('/all1')
+def all_article1():
+    id = request.args.get('id')
+    user = User.query.get(id)
+    return render_template('article/all1.html', user=user)

@@ -14,8 +14,3 @@ class Article(db.Model):
     
     #外键  左侧的建名必须参照右侧字符串所示的user.id里的内容存在才能建立 这个小写的user是数据库里边的表名不是模型类名！
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False) #这个是同步到数据库的，里边要存关系踺值的
-    
-    
-    
-    
-    

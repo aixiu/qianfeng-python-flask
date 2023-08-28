@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>文章展示</title>
+    <style>
+        #container{
+            border: 1px solid brown;
+            margin-bottom: 10px;
+            padding: 10px;
+        }
+    </style>
+</head>
+<body>
+    <!-- 根据用户找文章们 -->
+    <!-- select * from user,article on user.id=article.user_id where user.id=3 -->
+    {% for article in user.articles %}
+        <div id="container">
+            <p>
+                <h3>{{ user.title }}</h3>                
+                <div>作者：{{ user.username }}</div>
+            </p>
+            <p>
+                {{ article.content }}
+            </p>
+            <div>{{ article.pdatetime.strftime("%Y-%m-%d %H:%M:%S") }}</div>
+        </div>
+    {% endfor %}    
+</body>
+</html>

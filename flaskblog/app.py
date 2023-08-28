@@ -34,3 +34,4 @@ if __name__ == '__main__':
     
 # 一对多关系 文档 http://www.pythondoc.com/flask-sqlalchemy/models.html#one-to-many
 # flask_sqlalchemy数据库的外键与连接  https://blog.csdn.net/gaoke11240/article/details/120555953
+# Flask-SQLAlchemy外键及其关系  https://blog.csdn.net/qq_45112637/article/details/108383514

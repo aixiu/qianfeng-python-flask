@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>文章展示</title>
+    <style>
+        #container{
+            border: 1px solid brown;
+            margin-bottom: 10px;
+            padding: 10px;
+        }
+    </style>
+</head>
+<body>
+    {% for article in articles %}
+        <div id="container">
+            <p>
+                <h3>{{ article.title }}</h3>
+                <!-- 根据文章找作者 -->
+                <!-- articles = db.relationship('Article', backref ='user' ) 这里user.models.py做了反向查找找用户时，直接用user调用用户数据，这句写在user.models.py或是article.models.py都是可以的 -->
+                <div>作者：{{ article.user.username }}</div>
+            </p>
+            <p>
+                {{ article.content }}
+            </p>
+            <div>{{ article.pdatetime.strftime("%Y-%m-%d %H:%M:%S") }}</div>
+        </div>
+    {% endfor %}    
+</body>
+</html>
