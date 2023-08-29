@@ -7,15 +7,13 @@
 </head>
 <body>
     <form action="{{ url_for('article.publish_article') }}" method="post">
-        <p><input type="text" name="title" placeholder="文章标题"></p>
+        <p><input type="text" name="title" placeholder="文章标题" style="height: 20px; width: 500px;"></p>
         <p>
-            <textarea name="content" cols="50" rows="10" placeholder="输入文章内容">
-
-            </textarea>
+            <textarea name="content" cols="50" rows="10" placeholder="文章内容" style="height: 160px; width: 500px;"></textarea>
         </p>
         <p>
             用户：
-            <select name="uid">
+            <select name="uid" style="height: 25px; width: 100px;">
                 <option value="0">请选择用户</option>
                 {% for user in users %}
                     <option value="{{ user.id }}"> {{user.username}} </option>                    
