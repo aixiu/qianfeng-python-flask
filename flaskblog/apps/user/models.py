@@ -31,7 +31,7 @@ class User(db.Model):
     rdatetime = db.Column(db.DateTime, default=datetime.now)
     
     #增加一个字段 ，以及反向引用
-    articles = db.relationship('Article', backref ='user' )#这块是给模板用的，不在数据库里体现，但是模板里边可以引用
+    articles = db.relationship('Article', backref ='user' )#这块是给模板用的，不在数据库里体现，但是模板里边可以引用   Article 模型名
     # relationship 是给模板使用的，ForeignKey是做映射使用的
     
     def __str__(self):

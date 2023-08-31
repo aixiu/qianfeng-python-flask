@@ -3,6 +3,7 @@ from setting import DevelopmentConfig
 from exts import db
 from apps.user.view import user_bp
 from apps.article.view import article_bp
+from apps.goods.view import goods_bp
 
 def create_app():
     app = Flask(__name__, template_folder='../templates/', static_folder='../static/')
@@ -14,6 +15,7 @@ def create_app():
     # 注册蓝图
     app.register_blueprint(user_bp)  # 用户蓝图
     app.register_blueprint(article_bp)  # 文章蓝图
+    app.register_blueprint(goods_bp)  # 购买商品蓝图
     
     # 调试用，打印所有路由
     print(app.url_map)
