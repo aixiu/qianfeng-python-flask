@@ -156,3 +156,36 @@ class Article(db.Model)
     user_id = db.Column(db.Integer, db.Foreignkey('user.id'))
     # user = db.relationship('User', backref='article')
 
+
+----模板
+    --html
+    --js
+    --css 
+    --images
+
+使用flask-bootstrap:
+步骤：
+1、pip install flask-bootstrap
+2、进行配置： 
+    在：exts\__init__.py 中
+    from flask_bootstrap import Bootstrap
+    bootstrap = Bootstrap()
+
+    在：apps\__init__.py 中
+    # 初始化bootstrap
+    bootstrap.init_app(app=app)
+3、使用：
+    内置的block
+
+    {% extends "bootstrap/base.html" %}
+    {% block title %}首页{% endblock %}
+
+    {% block navbar %} {% endblock %}
+
+    {% block content %} {% endblock %}
+
+    {% block styles %}  {% endblock %}
+    {% block head %} {% endblock %}
+    {% block body %} {% endblock %}
+
+    
