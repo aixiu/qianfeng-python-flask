@@ -18,13 +18,13 @@
     {% for article in user.articles %}
         <div id="container">
             <p>
-                <h3>{{ user.title }}</h3>                
+                <h3>{{ article.title }}</h3>                
                 <div>作者：{{ user.username }}</div>
             </p>
             <p>
                 {{ article.content }}
             </p>
-            <div>{{ article.pdatetime.strftime("%Y-%m-%d %H:%M:%S") }}</div>
+            <div>分类：{{ article.articletype.type_name }} | 发布时间：{{ article.pdatetime.strftime("%Y-%m-%d %H:%M:%S") }}</div>
         </div>
     {% endfor %}    
 </body>

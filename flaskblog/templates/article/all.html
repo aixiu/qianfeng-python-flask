@@ -24,7 +24,7 @@
             <p>
                 {{ article.content }}
             </p>
-            <div>{{ article.pdatetime.strftime("%Y-%m-%d %H:%M:%S") }}</div>
+            <div>分类：{{ article.articletype.type_name }} | 发布时间：{{ article.pdatetime.strftime("%Y-%m-%d %H:%M:%S") }}</div>
         </div>
     {% endfor %}    
 </body>

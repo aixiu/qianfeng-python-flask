@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, request
 from apps.user.models import User
-from apps.article.models import Article
+from apps.article.models import Article, Article_type
 from exts import db
 
 article_bp = Blueprint('article', __name__)
@@ -12,6 +12,7 @@ def publish_article():
         title = request.form.get('title')
         content = request.form.get('content')
         uid = request.form.get('uid')
+        type_id = request.form.get('type')
         
         # 添加文章
         # 1、找到模型类并创建对
@@ -20,6 +21,7 @@ def publish_article():
         article.title = title
         article.content =  content
         article.user_id = uid
+        article.type_id = type_id
         # 添加数据  session缓存
         # 3、将 user 对象添加到 session中（类似缓存）
         db.session.add(article)
@@ -28,7 +30,8 @@ def publish_article():
         return '添加成功'
     else:
         users = User.query.filter(User.isdelete == False).all()
-        return render_template('article/add_article.html', users=users)
+        article_type = Article_type.query.all()
+        return render_template('article/add_article.html', users=users, article_type=article_type)
     
 # 展示文章，根据文章找作者
 @article_bp.route('/all')

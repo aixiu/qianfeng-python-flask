@@ -120,3 +120,39 @@ user.phone = xxx
 # 提交更改
 db.session.commit()
 
+
+'''python
+class Page(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    tags = db.relationship('Tag', secondary='Page_tag', backref='pages')
+
+class Tag(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(20), nullable=False)
+
+class Page_tag(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    db.Column('tag_id', db.Integer, db.Foreignkey('tag.id))
+    db.Column('page_id', db.Integer, db.Foreignkey('page.id))
+
+
+'''
+
+
+
+尝分析：
+
+电影订票网站中：电影与用户的关系
+电影 goods   user
+
+class User(db.Model):
+    xxxx
+    articles = db.relationship('Article', backref='user')
+
+
+# Foreignkey 加到一对多，多的这张表,一句话，在多上加外键，关联
+class Article(db.Model)
+    xxxx
+    user_id = db.Column(db.Integer, db.Foreignkey('user.id'))
+    # user = db.relationship('User', backref='article')
+
