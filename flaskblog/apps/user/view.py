@@ -43,6 +43,7 @@ def user_center():
     print(users)  # [<User 1>, <User 2>] 用户对像列表
     return render_template('user/center.html', users=users)
 
+# 登录
 @user_bp.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
