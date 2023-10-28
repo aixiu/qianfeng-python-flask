@@ -56,8 +56,10 @@
 {% endblock %}
 
 {% block content %}
-    <h1>Hello, Bootstrap</h1>
+    {% block newcontent %}
+        <h1>Hello, Bootstrap</h1>
+    {% endblock %}    
     {% block footer %}
-    <p id="myfoot">京公网安备11000002000001号-京ICP证030173号</p>
+        <p id="myfoot">京公网安备11000002000001号-京ICP证030173号</p>
     {% endblock %}
 {% endblock %}
