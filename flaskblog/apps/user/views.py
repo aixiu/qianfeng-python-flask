@@ -58,16 +58,15 @@ def check_phone():
 @user_bp1.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        userinfo = request.form.to_dict()
-        # 关键 select * from user where username 查找用户名或密码
-        new_password = hashlib.sha256(userinfo.get('password').encode('utf-8')).hexdigest()
+        userinfo = request.form.to_dict()        
         # 查询 在数据库里找 在键名为 username 里找 叫userinfo.get('username')的对象
         user_list = User.query.filter_by(username=userinfo.get('username'))
-        print(user_list)
         for u in user_list:
             # 此时的u表示的就是用户对象
-            if u.password == new_password:
+            # 如果flag=True表示匹配，否则密码不匹配
+            flag = check_password_hash(User.password, userinfo.get('password'))
+            if flag:
                 return '用户登录成功'
         else:
-            return render_template('user/login.html', msg='用户名或者密码有误')
+            return render_template('user/login1.html', msg='用户名或者密码有误')
     return render_template('user/login1.html')
