@@ -189,6 +189,16 @@ class Article(db.Model)
     {% block body %} {% endblock %}
 
 
+密码加密：
+注册：
+generate_password_hash(password)  ----> 加密后的密码
+sha256加密$salt$48783748uhr8738478473...
+
+登录：
+check_password_hash(数据库获取的密码（已加密）,原始密码)  -----> bool:False,True
+check_password_hash(pwdHash,password)  -----> bool:False,True
+
+
 会话机制：
 1。cookie方式：
 

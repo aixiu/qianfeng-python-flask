@@ -56,7 +56,7 @@
         </div>
         <div class="logintab">
             <p class="tips">{{ msg }}</p>
-            <form class="form-horizontal" method="post" action="{{ url_for('user1.login') }}">
+            <form class="form-horizontal" method="post" action="{{ url_for('user1.login') }}?f=1">
                 <div class="form-group">
 
                     <div class="col-md-6 col-md-offset-3">
@@ -79,7 +79,7 @@
                 </div>
             </form>
         </div>
-        <!-- <div class="logintab">
+        <div class="logintab">
             <p class="tips">{{ msg }}</p>
             <form class="form-horizontal" method="post" action="{{ url_for('user1.login') }}?f=2">
                 <div class="form-group">
@@ -106,8 +106,40 @@
                     </div>
                 </div>
             </form>
-        </div> -->
+        </div>
     </div>
 
+{% endblock %}
+{% block scripts %}
+    {{ super() }}
+    <script>
+        $(function () {
+                // 显示|隐藏 登录方式
+                $(".logintab").hide();
+                $(".logintab").first().show();
+                $("#tab span").each(function (i) {
+                    $(this).click(function () {
+                        $(".logintab").hide();
+                        $(".logintab").eq(i).show();
+                    })
+                });
+
+                // 发送验证码
+                $('#btnCheck').click(function () {
+                    let phone = $('#inputPhone').val();
+                    let span_obj = $('#inputPhone').next('span');
+                    span_obj.css({'color': 'red', 'font-size': '12px'});
+                    if (phone.length == 11) {
+                        //发送ajax
+                        $.get('{{ url_for('user1.send_message') }}',{phone:phone},function(data){
+
+                        });
+                    } else {
+                        span_obj.text('必须输入11位手机号码')
+                    }
+                });
+            }
+        )
+    </script>
 {% endblock %}
 
