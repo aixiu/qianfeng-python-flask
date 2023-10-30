@@ -254,3 +254,5 @@ check_password_hash(pwdHash,password)  -----> bool:False,True
    删除
     session.clear()  删除session的内存空间和删除cookie
     del session[key]  只会删除session中的这个键值对，不会删除session空间和cookie
+
+businessId

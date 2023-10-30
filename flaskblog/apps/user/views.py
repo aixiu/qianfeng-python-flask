@@ -4,6 +4,7 @@ from sqlalchemy import and_, not_, or_
 from apps.user.models import User   # 蓝图相关
 from exts import db
 from werkzeug.security import generate_password_hash, check_password_hash
+from apps.user.smssend import SmsSendAPIDemo
 
 # 创建一个蓝图名为 user1 在当前文件定义就写 __name__  
 # url_prefix='/user'  路由变为 http://127.0.0.1/user/XXXX
@@ -123,7 +124,6 @@ def send_message():
     if ret is not None:
         if ret["code"] == 200:
             taskId = ret["result"]["taskId"]
-            print("taskId = %s" % taskId)
-            
+            print("taskId = %s" % taskId)            
         else:
             print("ERROR: ret.code=%s,msg=%s" % (ret['code'], ret['msg']))
