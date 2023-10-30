@@ -1,5 +1,5 @@
 import hashlib
-from flask import Blueprint, jsonify, redirect, render_template, request, url_for
+from flask import Blueprint, jsonify, redirect, render_template, request, session, url_for
 from sqlalchemy import and_, not_, or_
 from apps.user.models import User   # 蓝图相关
 from exts import db
@@ -12,7 +12,15 @@ user_bp1 = Blueprint('user1', __name__, url_prefix='/user')
 # 首页
 @user_bp1.route('/')
 def index():
-    return render_template('user/index.html')
+    # 1、cookie获取方式
+    # uid = request.cookies.get('uid', None)
+    # 2、session的获取,session底层默认获取
+    uid = session.get('uid')
+    if uid:
+        user = User.query.get(uid)
+        return render_template('user/index.html', user=user)
+    else:
+        return render_template('user/index.html')
 
 # 用户注册
 @user_bp1.route('/register', methods=['GET', 'POST'])
@@ -37,7 +45,7 @@ def register():
             # 4、提交数据
             db.session.commit()
             
-            return redirect(url_for('user.index'))
+            return redirect(url_for('user1.index'))
         else:
             return '两次密码不一致'
     return render_template('user/register1.html')
@@ -64,9 +72,27 @@ def login():
         for u in user_list:
             # 此时的u表示的就是用户对象
             # 如果flag=True表示匹配，否则密码不匹配
-            flag = check_password_hash(User.password, userinfo.get('password'))
+            flag = check_password_hash(u.password, userinfo.get('password'))
             if flag:
-                return '用户登录成功'
+                # 1。cookie实现机制
+                # response = redirect(url_for('user1.index'))
+                # response.set_cookie('uid', str(u.id), max_age=1800)
+                # return response
+                # 2。session机制,session当成字典使用
+                session['uid'] = u.id
+                return redirect(url_for('user1.index'))
         else:
             return render_template('user/login1.html', msg='用户名或者密码有误')
     return render_template('user/login1.html')
+
+
+@user_bp1.route('/logout')
+def logout():
+    response = redirect(url_for('user1.index'))
+    # 通过response对象的delete_cookie(key),key就是要删除的cookie的key
+    response.delete_cookie('uid')
+    
+    # session方法删除
+    del session['uid']
+    # session.clear()
+    return response

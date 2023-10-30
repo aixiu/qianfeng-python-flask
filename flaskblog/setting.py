@@ -16,6 +16,8 @@ class Config:
     SQLALCHEMY_DATABASE_URI = 'sqlite:///flask-blog.db'#设置数据库URL
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SQLALCHEMY_ECHO = True
+    # secret_key
+    SECRET_KEY = 'aixiu_shendlax'
     
 class DevelopmentConfig(Config):
     ENV = 'development'

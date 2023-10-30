@@ -188,4 +188,59 @@ class Article(db.Model)
     {% block head %} {% endblock %}
     {% block body %} {% endblock %}
 
-    
+
+会话机制：
+1。cookie方式：
+
+  保存：
+    通过response对象保存。
+    response = redirect(xxx)
+    response = render_template(xxx)
+    response = Response()
+    response = make_response()
+    response = jsonify()
+    # 通过对象调用方法
+    response.set_cookie(key,value,max_age)
+    其中max_age表示过期时间，单位是秒
+    也可以使用expires设置过期时间，expires=datetime.now()+timedelta(hour=1)
+
+  获取：
+    通过request对象获取。
+    request.form.get()
+    request.args.get()
+    cookie也在request对象中
+    request.cookies.get(key) ----> value
+
+  删除：
+     通过response对象删除。 把浏览器中的key=value删除了
+    response = redirect(xxx)
+    response = render_template(xxx)
+    response = Response()
+    response = make_response()
+    response = jsonify()
+    # 通过对象调用方法
+    response.delete_cookie(key)
+
+2。session：  是在服务器端进行用户信息的保存。一个字典
+注意：
+使用session必须要设置配置文件，在配置文件中添加SECRET_KEY='xxxxx'，
+添加SECRET_KEY的目的就是用于sessionid的加密。如果不设置会报错。
+
+  设置：
+    如果要使用session，需要直接导入：
+    from flask import session
+
+    把session当成字典使用，因此：session[key]=value
+    就会将key=value保存到session的内存空间
+    **** 并会在响应的时候自动在response中自动添加有一个cookie：session=加密后的id ****
+  获取
+     用户请求页面的时候就会携带上次保存在客户端浏览器的cookie值，其中包含session=加密后的id
+     获取session值的话通过session直接获取，因为session是一个字典，就可以采用字典的方式获取即可。
+     value = session[key] 或者 value = session.get(key)
+     这个时候大家可能会考虑携带的cookie怎么用的？？？？
+     其实是如果使用session获取内容,底层会自动获取cookie中的sessionid值，
+     进行查找并找到对应的session空间
+
+   删除
+    session.clear()  删除session的内存空间和删除cookie
+    del session[key]  只会删除session中的这个键值对，不会删除session空间和cookie
