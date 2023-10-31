@@ -267,3 +267,39 @@ model:
 
 
 
+Jinja2模板-url_for函数
+模版中的 url_for 跟我们后台视图函数中的 url_for 使用起来基本是一模一样的。也是传递视图函数的名字，也可以传递参数。使用的时候，需要在 url_for 左右两边加上一个 {{ url_for('func') }}
+
+1、动态超链接
+html页面使用如：
+<a href="{{ url_for('login', user='张三', age=18) }}">登录</a>
+实际上就是动态路由
+
+点击变为：
+http://127.0.0.1:5000/login/%E5%BC%A0%E4%B8%89?age=18
+
+对应的视图函数
+@app.route('/login/<user>')
+def login(user):
+    print(user)
+    return "用户名：{}".format(user)
+
+
+2、加载静态文件
+静态文件：css文件 js文件 图片文件等文件
+
+加载静态文件使用的是 url_for 函数。然后第一个参数需要为 static ，第二个参数需要为一个关键字参数filename='路径' 。
+
+语法：{{ url_for("static",filename='xxx') }}
+
+<link href="{{ url_for('static',filename='css/main.css') }}" rel="stylesheet">
+
+<script src="{{ url_for('static',filename='js/main.js') }}"></script>
+
+<img src="{{ url_for('static',filename='img/main.jpg') }}"/>
+
+
+https://blog.csdn.net/m0_68744965/article/details/128293078
+https://blog.csdn.net/shuibuzhaodeshiren/article/details/86819537
+
+

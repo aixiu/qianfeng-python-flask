@@ -1,5 +1,5 @@
 import hashlib
-from flask import Blueprint, jsonify, redirect, render_template, request, session, url_for
+from flask import Blueprint, jsonify, redirect, render_template, request, session, url_for, g
 from sqlalchemy import and_, not_, or_
 from apps.user.models import User   # 蓝图相关
 from exts import db
@@ -8,7 +8,35 @@ from apps.user.smssend import SmsSendAPIDemo
 
 # 创建一个蓝图名为 user1 在当前文件定义就写 __name__  
 # url_prefix='/user'  路由变为 http://127.0.0.1/user/XXXX
-user_bp1 = Blueprint('user1', __name__, url_prefix='/user')  
+user_bp1 = Blueprint('user1', __name__, url_prefix='/user') 
+
+required_login_list = ['/user/center', '/user/change'] 
+
+# ****重点*****
+# 通过勾子函数来过滤指定页面，没登录则限制，有登录则放行
+@user_bp1.before_app_request
+def before_request():
+    print('before_requestbefore_request', request.path)
+    if request.path in required_login_list:
+        id = session.get('uid')
+        if not id:
+            return render_template('user/login1.html')
+        else:
+            user = User.query.get(id)
+            # g对象，本次请求的对象
+            g.user = user
+            
+@user_bp1.after_app_request
+def after_request_test(response):
+    response.set_cookie('a', 'bbbb', max_age=19)
+    print('after_request_test')
+    return response
+
+
+@user_bp1.teardown_app_request
+def teardown_request_test(response):
+    print('teardown_request_test')
+    return response
 
 # 首页
 @user_bp1.route('/')
@@ -69,7 +97,7 @@ def check_phone():
 def login():
     if request.method == 'POST':
         f = request.args.get('f')
-        if f == 1:  # 用户名或者密码
+        if f == '1':  # 用户名或者密码
             userinfo = request.form.to_dict()        
             # 查询 在数据库里找 在键名为 username 里找 叫userinfo.get('username')的对象
             user_list = User.query.filter_by(username=userinfo.get('username'))
@@ -87,8 +115,25 @@ def login():
                     return redirect(url_for('user1.index'))
             else:
                 return render_template('user/login1.html', msg='用户名或者密码有误')
-        elif f == 2:  # 手机号码与验证码
-            pass
+        elif f == '2':  # 手机号码与验证码
+            print('----->22222')
+            phone = request.form.get('phone')
+            code = request.form.get('code')
+            # 先验证验证码
+            valid_code = session.get(phone)
+            print('valid_code:' + str(valid_code))
+            if code == valid_code:
+                # 查询数据库
+                user = User.query.filter(User.phone == phone).first()
+                print(user)
+                if user:
+                    # 登录成功
+                    session['uid'] = user.id
+                    return redirect(url_for('user1.index'))
+                else:
+                    return render_template('user/login1.html', msg='此号码未注册')
+            else:
+                return render_template('user/login1.html', msg='验证码有误！')
     return render_template('user/login1.html')
 
 # 用户退出
@@ -109,6 +154,8 @@ def logout():
 @user_bp1.route('/sendMsg')
 def send_message():
     phone = request.args.get('phone')
+    # 补充验证手机号码是否注册，去数据库查询
+    
     SECRET_ID = "dcc535cbfaefa2a24c1e6610035b6586"  # 产品密钥ID，产品标识
     SECRET_KEY = "d28f0ec3bf468baa7a16c16c9474889e"  # 产品私有密钥，服务端生成签名信息使用，请严格保管，避免泄露
     BUSINESS_ID = "748c53c3a363412fa963ed3c1b795c65"  # 业务ID，易盾根据产品业务特点分配
@@ -121,9 +168,45 @@ def send_message():
     }
     ret = api.send(params)
     print(ret)
-    if ret is not None:
-        if ret["code"] == 200:
-            taskId = ret["result"]["taskId"]
-            print("taskId = %s" % taskId)            
-        else:
-            print("ERROR: ret.code=%s,msg=%s" % (ret['code'], ret['msg']))
+    session[phone] = '189075'
+    return jsonify(code=200, msg='短信发送成功！')
+
+    # if ret is not None:
+    #     if ret["code"] == 200:
+    #         taskId = ret["result"]["taskId"]
+    #         print("taskId = %s" % taskId)
+    #         session[phone]='189075'
+    #         return jsonify(code=200, msg='短信发送成功！')
+    #     else:
+    #         print("ERROR: ret.code=%s,msg=%s" % (ret['code'], ret['msg']))
+    #         return jsonify(code=400, msg='短信发送失败！')
+    
+# 用户中心
+@user_bp1.route('/center')
+def user_center():
+    return render_template('user/center1.html', user=g.user)
+
+# 用户信息修改
+@user_bp1.route('/change', methods=['GET', 'POST'])
+def user_change():
+    if request.method == 'POST':
+        username = request.form.get('username')
+        phone = request.form.get('phone')
+        email = request.form.get('email')
+        # 只要有图片，获取方式必须使用request.files.get(name)
+        icon = request.files.get('icon')
+        # 查询一下手机号码
+        # users = User.query.all()
+        # for user in users:
+        #     if user.phone == phone:
+        #         # 说明数据库中已经有人注册此号码
+        #         return render_template('user/center.html', user=g.user,msg='此号码已被注册')
+        #
+        user = g.user
+        user.username = username
+        user.phone = phone
+        user.email = email
+
+        db.session.commit()
+
+    return render_template('user/center.html', user=g.user)

@@ -255,4 +255,30 @@ check_password_hash(pwdHash,password)  -----> bool:False,True
     session.clear()  删除session的内存空间和删除cookie
     del session[key]  只会删除session中的这个键值对，不会删除session空间和cookie
 
-businessId
+
+SecretId：86c3df1bca30807233fa487ee066c055
+SecretKey：525cd84a8f8edb204a2edc4fcb3c92ed 
+businessId：6c0523977723472392011af551bfe3ce
+
+
+1.短信息发送：
+
+
+2.登录权限的验证
+只要走center路由，判断用户是否是登录状态，如果用户登录了，可以正常显示页面，如果用户没有登录
+则自动跳转到登录页面进行登录，登录之后才可以进行查看。
+
+钩子函数：
+直接应用在app上：
+before_first_request
+before_request
+after_request
+teardown_request
+
+应用到蓝图：
+before_app_first_request
+before_app_request
+after_app_request
+teardown_app_request
+
+3.文件上传

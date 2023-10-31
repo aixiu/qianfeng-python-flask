@@ -131,8 +131,12 @@
                     span_obj.css({'color': 'red', 'font-size': '12px'});
                     if (phone.length == 11) {
                         //发送ajax
-                        $.get('{{ url_for('user1.send_message') }}',{phone:phone},function(data){
-
+                        $.get('{{ url_for('user1.send_message') }}', {phone: phone}, function (data) {
+                            if (data.code == 200) {
+                                alert('短信发送成功请查收！');
+                            } else {
+                                alert(data.msg);
+                            }
                         });
                     } else {
                         span_obj.text('必须输入11位手机号码')

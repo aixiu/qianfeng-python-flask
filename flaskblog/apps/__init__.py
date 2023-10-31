@@ -25,6 +25,6 @@ def create_app():
     app.register_blueprint(goods_bp)  # 购买商品蓝图
     
     # 调试用，打印所有路由
-    print(app.url_map)
+    # print(app.url_map)
     
     return app
