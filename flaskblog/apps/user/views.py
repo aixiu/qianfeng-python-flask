@@ -1,10 +1,12 @@
-import hashlib
+import os
 from flask import Blueprint, jsonify, redirect, render_template, request, session, url_for, g
 from sqlalchemy import and_, not_, or_
 from apps.user.models import User   # 蓝图相关
 from exts import db
 from werkzeug.security import generate_password_hash, check_password_hash
 from apps.user.smssend import SmsSendAPIDemo
+from werkzeug.utils import secure_filename
+from setting import Config
 
 # 创建一个蓝图名为 user1 在当前文件定义就写 __name__  
 # url_prefix='/user'  路由变为 http://127.0.0.1/user/XXXX
@@ -184,7 +186,12 @@ def send_message():
 # 用户中心
 @user_bp1.route('/center')
 def user_center():
-    return render_template('user/center1.html', user=g.user)
+    # types = Article_type.query.all()
+    return render_template('user/center1.html', user=g.user,)
+
+
+# 图片的扩展名
+ALLOWED_EXTENSIONS = ['jpg', 'png', 'gif', 'bmp']
 
 # 用户信息修改
 @user_bp1.route('/change', methods=['GET', 'POST'])
@@ -193,8 +200,32 @@ def user_change():
         username = request.form.get('username')
         phone = request.form.get('phone')
         email = request.form.get('email')
-        # 只要有图片，获取方式必须使用request.files.get(name)
+        # 只要有文件（图片），获取方式必须使用request.files.get(name)
         icon = request.files.get('icon')
+        # print('======>', icon)  # FileStorage
+        # 属性： filename 用户获取文件的名字
+        # 方法:  save(保存路径)
+        icon_name = icon.filename  # 1440w.jpg
+        suffix = icon_name.rsplit('.')[-1]
+        if suffix in ALLOWED_EXTENSIONS:
+            icon_name = secure_filename(icon_name)  # 保证文件名是符合python的命名规则
+            file_path = os.path.join(Config.UPLOAD_ICON_DIR, icon_name)
+            icon.save(file_path)
+            # 保存成功
+            
+            user = g.user
+            user.username = username
+            user.phone = phone
+            user.email = email
+            path = 'upload/icon/' # 或是末尾一定要 /不然后边地加上 \ 否则显示 %5C  出错  或是用下边一行
+            # user.icon = os.path.join(path, icon_name).replace('\\', '/')  # 把路径中的 \替换为 / 否则显示 %5C  出错
+            user.icon = os.path.join(path, icon_name)
+            db.session.commit()
+            
+            return redirect(url_for('user1.user_center'))
+        else:
+            return render_template('user/center1.html', user=g.user, msg='必须是扩展名是：jpg,png,gif,bmp格式')
+
         # 查询一下手机号码
         # users = User.query.all()
         # for user in users:
@@ -202,11 +233,5 @@ def user_change():
         #         # 说明数据库中已经有人注册此号码
         #         return render_template('user/center.html', user=g.user,msg='此号码已被注册')
         #
-        user = g.user
-        user.username = username
-        user.phone = phone
-        user.email = email
-
-        db.session.commit()
 
     return render_template('user/center.html', user=g.user)

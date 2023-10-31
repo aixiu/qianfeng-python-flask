@@ -30,8 +30,7 @@
                     </p>
                     <p><input type="file" id="exampleInputFile" name="icon"></p>
                     <p>
-                        <img src="{{ url_for('static',filename='images/touxiang.jpg') }}" alt="{{ g.user.username }}" width="90"
-                             height="90">
+                        <img src="{% if g.user.icon %}  {{ url_for('static',filename=user.icon) }} {% else %}{{ url_for('static',filename='images/touxiang.jpg') }}{% endif %}" alt="{{ g.user.username }}" width="90" height="90">
                     </p>
                     <p>
                         <button type="submit" class="btn btn-primary">用户信息修改</button>
