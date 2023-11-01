@@ -1,6 +1,7 @@
 import os
 from flask import Blueprint, jsonify, redirect, render_template, request, session, url_for, g
 from sqlalchemy import and_, not_, or_
+from apps.article.models import Article, Article_type
 from apps.user.models import User   # 蓝图相关
 from exts import db
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -12,7 +13,7 @@ from setting import Config
 # url_prefix='/user'  路由变为 http://127.0.0.1/user/XXXX
 user_bp1 = Blueprint('user1', __name__, url_prefix='/user') 
 
-required_login_list = ['/user/center', '/user/change'] 
+required_login_list = ['/user/center', '/user/change', '/article/publish'] 
 
 # ****重点*****
 # 通过勾子函数来过滤指定页面，没登录则限制，有登录则放行
@@ -40,6 +41,15 @@ def teardown_request_test(response):
     print('teardown_request_test')
     return response
 
+# 自定义过滤器  python3 字符串默认是Unicode编码，不再需要进行解码操作
+@user_bp1.app_template_filter('cdecode')
+def content_decode(content):
+    # content = content.decode('utf-8')
+    if len(content) >= 200:
+        return f'{content[:200]}......'
+    else:
+        return f'{content}'
+
 # 首页
 @user_bp1.route('/')
 def index():
@@ -48,11 +58,34 @@ def index():
     
     # 2、session的获取,session底层默认获取
     uid = session.get('uid')
+    
+    # 获取文章列表
+    # articles = Article.query.order_by(Article.pdatetime.desc()).all()   # 默认是正序，  .asc()正序  .desc()倒序
+    
+    
+    # 获取文章列表   7 6 5  |  4 3 2 | 1
+    # 接收页码数
+    page = int(request.args.get('page', 1))
+    pagination = Article.query.order_by(Article.pdatetime.desc()).paginate(page=page, per_page=3)  # paginate分页， page 页码，per_page每页显示3篇
+    
+    print(pagination.items)  # [<Article 4>, <Article 3>, <Article 2>]
+    print(pagination.page)  # 当前的页码数
+    print(pagination.prev_num)  # 当前页的前一个页码数
+    print(pagination.next_num)  # 当前页的后一页的页码数
+    print(pagination.has_next)  # True  有没有上一页
+    print(pagination.has_prev)  # True  有没有下一页
+    print(pagination.pages)  # 总共有几页
+    print(pagination.total)  # 总的记录条数
+
+    # 获取分类列表
+    types = Article_type.query.all()
+    
+    # 判断用户是否登录    
     if uid:
         user = User.query.get(uid)
-        return render_template('user/index.html', user=user)
+        return render_template('user/index.html', user=user, types=types, pagination=pagination)
     else:
-        return render_template('user/index.html')
+        return render_template('user/index.html', types=types, pagination=pagination)
 
 # 用户注册
 @user_bp1.route('/register', methods=['GET', 'POST'])
@@ -186,8 +219,8 @@ def send_message():
 # 用户中心
 @user_bp1.route('/center')
 def user_center():
-    # types = Article_type.query.all()
-    return render_template('user/center1.html', user=g.user,)
+    types = Article_type.query.all()
+    return render_template('user/center1.html', user=g.user, types=types)
 
 
 # 图片的扩展名
