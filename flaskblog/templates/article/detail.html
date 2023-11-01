@@ -78,7 +78,6 @@
 
                 $.get('{{ url_for('article1.article_love') }}', {aid:{{article.id}}, tag: tag}, function (data) {
                     $this.next('span').text(data.num);
-
                 });
                 if (tag == 1) {
                     $this.css({'color': 'black'});
