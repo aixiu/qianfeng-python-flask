@@ -13,9 +13,8 @@
         .article {
             width: 90%;
             margin: 20px auto;
-            padding: 5px 10px;
-            background-color: rgb(231 231 231);
-            border-bottom: 1px solid #a7a7a7;
+            padding: 10px 20px;
+            background-color: rgba(231, 231, 231, 0.5);
             border-radius: 4px;
         }
 
@@ -46,7 +45,7 @@
     <div id="container">
         {% for article in pagination.items %}
             <div class="article">
-                <h4><a href="">{{ article.title }}</a></h4>
+                <h4><a href="{{ url_for('article1.article_detail') }}?aid={{ article.id }}">{{ article.title }}</a></h4>
                 <p>
                     <span>作者：{{ article.user.username }}</span> &nbsp;&nbsp;|&nbsp;&nbsp; <span>分类：{{ article.articletype.type_name }}</span>
                     <br>
