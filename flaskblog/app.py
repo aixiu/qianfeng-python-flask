@@ -5,7 +5,7 @@
 
 from flask_migrate import Migrate
 # from flask_script import Manager  # 高版本已不再使用
-from apps.user.models import User  # 一定要导入模型模块
+from apps.user.models import *  # 一定要导入模型模块
 from apps.article.models import * # 一定要导入模型模块
 from apps.goods.models import *
 from apps import create_app

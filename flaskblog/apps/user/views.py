@@ -2,18 +2,19 @@ import os
 from flask import Blueprint, jsonify, redirect, render_template, request, session, url_for, g
 from sqlalchemy import and_, not_, or_
 from apps.article.models import Article, Article_type
-from apps.user.models import User   # 蓝图相关
+from apps.user.models import User, Photo   # 蓝图相关
 from exts import db
 from werkzeug.security import generate_password_hash, check_password_hash
 from apps.user.smssend import SmsSendAPIDemo
 from werkzeug.utils import secure_filename
 from setting import Config
+from apps.utils.util import upload_qiniu
 
 # 创建一个蓝图名为 user1 在当前文件定义就写 __name__  
 # url_prefix='/user'  路由变为 http://127.0.0.1/user/XXXX
 user_bp1 = Blueprint('user1', __name__, url_prefix='/user') 
 
-required_login_list = ['/user/center', '/user/change', '/article/publish'] 
+required_login_list = ['/user/center', '/user/change', '/article/publish', 'user/upload_photo'] 
 
 # ****重点*****
 # 通过勾子函数来过滤指定页面，没登录则限制，有登录则放行
@@ -45,9 +46,9 @@ def teardown_request_test(response):
 @user_bp1.app_template_filter('cdecode')
 def content_decode(content):
     # content = content.decode('utf-8')
-    if len(content) >= 200:
-        return f'{content[:200]}......'
-    else:
+    # if len(content) >= 200:
+    #     return f'{content[:200]}......'
+    # else:
         return f'{content}'
 
 # 首页
@@ -268,3 +269,35 @@ def user_change():
         #
 
     return render_template('user/center.html', user=g.user)
+
+
+# 发表文章
+@user_bp1.route('/article', methods=['GET', 'POST'])
+def publish_article():
+    if request.method == 'POST':
+        title = request.form.get('title')
+        type = request.form.get('type')
+        content = request.form.get('content')
+        print(title, type, content)
+
+        return render_template('article/test.html', content=content)
+    return '发表失败！'
+
+
+# 上传照片
+@user_bp1.route('/upload_photo', methods=['GET', 'POST'])
+def upload_photo():
+    # 获取上传的内容
+    photo = request.files.get('photo')  # FileStorage
+    # photo.filename,photo.save(path)
+    # 工具模块中封装方法
+    ret, info = upload_qiniu(photo)
+    if info.status_code == 200:
+        photo = Photo()
+        photo.photo_name = ret['key']
+        photo.user_id = g.user.id
+        db.session.add(photo)
+        db.session.commit()
+        return '上传成功！'
+    else:
+        return '上传失败！'

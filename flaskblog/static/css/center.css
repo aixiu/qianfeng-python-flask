@@ -51,5 +51,15 @@
     padding-left: 120px;
     padding-top: 100px;
 }
+.right1 img{
+    border-radius: 6px;
+}
+
+.image {
+    width: 100px;
+    height: 100px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
 
 
