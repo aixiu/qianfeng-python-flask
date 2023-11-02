@@ -289,7 +289,7 @@ def publish_article():
 def upload_photo():
     # 获取上传的内容
     photo = request.files.get('photo')  # FileStorage
-    # photo.filename,photo.save(path)
+    # photo.filename, photo.save(path)
     # 工具模块中封装方法
     ret, info = upload_qiniu(photo)
     if info.status_code == 200:

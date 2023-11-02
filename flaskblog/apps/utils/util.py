@@ -6,12 +6,12 @@ import qiniu.config
 
 def upload_qiniu(filestorage):
     # 需要填写你的 Access Key 和 Secret Key
-    access_key = '1fXvG9wkbN7AgRUG6usHDcRP5Bb85apcovRAIITP'
-    secret_key = 'Aqf1lPAmUG72EdZJ7PxKtWHfWDYNdUycZP1TaAIN'
+    access_key = 'VSRtzMjvuLNBjt3mnVsYr68eacBsf-cGjVgGSPJK'
+    secret_key = 'brmU6CUY_UBmOJi_iwQ7Ji_dU6YRhzlaGNiQnLpd'
     # 构建鉴权对象
     q = Auth(access_key, secret_key)
     # 要上传的空间
-    bucket_name = 'myblog202005'
+    bucket_name = 'flskblog'
     # 上传后保存的文件名
     filename = filestorage.filename
     ran = random.randint(1, 1000)
