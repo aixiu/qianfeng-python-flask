@@ -14,7 +14,7 @@ from apps.utils.util import upload_qiniu
 # url_prefix='/user'  路由变为 http://127.0.0.1/user/XXXX
 user_bp1 = Blueprint('user1', __name__, url_prefix='/user') 
 
-required_login_list = ['/user/center', '/user/change', '/article/publish', 'user/upload_photo'] 
+required_login_list = ['/user/center', '/user/change', '/article/publish', '/user/upload_photo'] 
 
 # ****重点*****
 # 通过勾子函数来过滤指定页面，没登录则限制，有登录则放行

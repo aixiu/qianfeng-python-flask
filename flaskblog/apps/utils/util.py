@@ -1,4 +1,4 @@
-import random
+from datetime import datetime
 
 from qiniu import Auth, put_file, etag, put_data
 import qiniu.config
@@ -14,13 +14,13 @@ def upload_qiniu(filestorage):
     bucket_name = 'flskblog'
     # 上传后保存的文件名
     filename = filestorage.filename
-    ran = random.randint(1, 1000)
-    suffix = filename.rsplit('.')[-1]
-    key = filename.rsplit('.')[0] + '_' + str(ran) + '.' + suffix
+    ran = datetime.now().strftime('%Y%m%d%H%M%S')
+    suffix = filename.rsplit('.')[-1]    
+    key = f"{filename.rsplit('.')[0]}_{ran}.{suffix}"
     # 生成上传 Token，可以指定过期时间等
     token = q.upload_token(bucket_name, key, 3600)
     # 要上传文件的本地路径
     # localfile = './sync/bbb.jpg'
     # ret, info = put_file(token, key, localfile)
-    ret, info = put_data(token, key, filestorage.read())
+    ret, info = put_data(up_token=token, key=key, data=filestorage.read())
     return ret, info
