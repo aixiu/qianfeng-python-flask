@@ -221,7 +221,8 @@ def send_message():
 @user_bp1.route('/center')
 def user_center():
     types = Article_type.query.all()
-    return render_template('user/center1.html', user=g.user, types=types)
+    photos = Photo.query.filter(Photo.user_id == g.user.id).all()
+    return render_template('user/center1.html', user=g.user, types=types, photos=photos)
 
 
 # 图片的扩展名
@@ -301,3 +302,18 @@ def upload_photo():
         return '上传成功！'
     else:
         return '上传失败！'
+    
+    
+@user_bp1.route('/myphoto')
+def myphoto():
+    page = int(request.args.get('page', 1))
+    # 分页操作
+    photos = Photo.query.paginate(page=page, per_page=2)
+    user_id = session['uid']
+    user = None
+    if user_id:
+        user = User.query.get(user_id)
+    return render_template('user/myphoto.html', photos=photos, user=user)
+    
+    # photos = Photo.query.all()
+    # return render_template('user/myphoto.html', photos=photos)

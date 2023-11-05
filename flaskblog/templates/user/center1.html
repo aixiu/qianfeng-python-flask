@@ -72,24 +72,12 @@
                     <div class="col-sm-12">
                         <h3>我的相册</h3>
                         <div class="row">
-                            <div class="col-xs-8 col-sm-4">
-                                <img src="{{ url_for('static',filename='images/touxiang.jpg') }}" alt="..." class="img-rounded image">
-                            </div>
-                            <div class="col-xs-4 col-sm-4">
-                                <img src="{{ url_for('static',filename='images/touxiang.jpg') }}" alt="..." class="img-rounded image">
-                            </div>
-                            <div class="col-xs-8 col-sm-4">
-                                <img src="{{ url_for('static',filename='images/touxiang.jpg') }}" alt="..." class="img-rounded image">
-                            </div>
-                            <div class="col-xs-8 col-sm-4">
-                                <img src="{{ url_for('static',filename='images/touxiang.jpg') }}" alt="..." class="img-rounded image">
-                            </div>
-                            <div class="col-xs-8 col-sm-4">
-                                <img src="{{ url_for('static',filename='images/touxiang.jpg') }}" alt="..." class="img-rounded image">
-                            </div>
-                            <div class="col-xs-8 col-sm-4">
-                                <img src="{{ url_for('static',filename='images/touxiang.jpg') }}" alt="..." class="img-rounded image">
-                            </div>
+                            {% for photo in photos %}
+                                <div class="col-xs-8 col-sm-4">
+                                    <img src="http://s3h129u0z.hn-bkt.clouddn.com/{{ photo.photo_name }}"
+                                         alt="..." class="img-rounded image">
+                                </div>
+                            {% endfor %}
                         </div>
                     </div>
                 </div>

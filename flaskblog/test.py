@@ -37,17 +37,33 @@
 # assert ret['hash'] == etag(localfile)
 
 
-import time
-from datetime import datetime
+# import time
+# from datetime import datetime
 
 
-filename = 'tupian.jpg'
+# filename = 'tupian.jpg'
 
-# timeName = str(time.time()).split('.')[0]   # ==> tupian_1698977039.jpg
-timeName = datetime.now().strftime('%Y%m%d%H%M%S')  # ==> tupian_20231103100539.jpg
+# # timeName = str(time.time()).split('.')[0]   # ==> tupian_1698977039.jpg
+# timeName = datetime.now().strftime('%Y%m%d%H%M%S')  # ==> tupian_20231103100539.jpg
 
-suffix = filename.rsplit('.')[-1]
-key = f"{filename.rsplit('.')[0]}_{timeName}.{suffix}"
+# suffix = filename.rsplit('.')[-1]
+# key = f"{filename.rsplit('.')[0]}_{timeName}.{suffix}"
 
-print(key)
+# print(key)
 
+
+# 七牛下载
+import requests
+from qiniu import Auth
+
+access_key = 'VSRtzMjvuLNBjt3mnVsYr68eacBsf-cGjVgGSPJK'
+secret_key = 'brmU6CUY_UBmOJi_iwQ7Ji_dU6YRhzlaGNiQnLpd'  
+
+q = Auth(access_key, secret_key)
+bucket_domain = 's3h129u0z.hn-bkt.clouddn.com' #可以在空间设置的域名设置中找到
+key = 'my-python-logo.png'
+base_url = f"http://{bucket_domain}/{key}"
+private_url = q.private_download_url(base_url, expires=3600)
+print(private_url)
+r = requests.get(private_url)
+assert r.status_code == 200
