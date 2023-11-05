@@ -1,4 +1,4 @@
-from flask import Blueprint, g, jsonify, redirect, render_template, request, url_for
+from flask import Blueprint, g, jsonify, redirect, render_template, request, session, url_for
 from apps.user.models import User
 from apps.article.models import Article, Article_type
 from exts import db
@@ -39,8 +39,13 @@ def article_detail():
     article = Article.query.get(article_id)
     # 获取文章分类
     types = Article_type.query.all()
+    
+    user_id = session['uid']
+    user = None
+    if user_id:
+        user = User.query.get(user_id)
 
-    return render_template('article/detail.html', article=article, types=types)
+    return render_template('article/detail.html', article=article, types=types, user=user)
 
 @article_bp1.route('/love')
 def article_love():

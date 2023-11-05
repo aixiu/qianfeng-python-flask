@@ -1,6 +1,5 @@
 import os
 from flask import Blueprint, jsonify, redirect, render_template, request, session, url_for, g
-from sqlalchemy import and_, not_, or_
 from apps.article.models import Article, Article_type
 from apps.user.models import User, Photo   # 蓝图相关
 from exts import db
@@ -8,13 +7,13 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from apps.user.smssend import SmsSendAPIDemo
 from werkzeug.utils import secure_filename
 from setting import Config
-from apps.utils.util import upload_qiniu
+from apps.utils.util import delete_qiniu, upload_qiniu
 
 # 创建一个蓝图名为 user1 在当前文件定义就写 __name__  
 # url_prefix='/user'  路由变为 http://127.0.0.1/user/XXXX
 user_bp1 = Blueprint('user1', __name__, url_prefix='/user') 
 
-required_login_list = ['/user/center', '/user/change', '/article/publish', '/user/upload_photo'] 
+required_login_list = ['/user/center', '/user/change', '/article/publish', '/user/upload_photo', '/user/photo_del'] 
 
 # ****重点*****
 # 通过勾子函数来过滤指定页面，没登录则限制，有登录则放行
@@ -303,17 +302,43 @@ def upload_photo():
     else:
         return '上传失败！'
     
-    
+# 我的相册 
 @user_bp1.route('/myphoto')
 def myphoto():
     page = int(request.args.get('page', 1))
     # 分页操作
     photos = Photo.query.paginate(page=page, per_page=2)
+    
+    # 获取文章分类
+    types = Article_type.query.all()
+    
     user_id = session['uid']
     user = None
     if user_id:
         user = User.query.get(user_id)
-    return render_template('user/myphoto.html', photos=photos, user=user)
+    return render_template('user/myphoto.html', photos=photos, user=user, types=types)
+
+# 删除相册图片
+@user_bp1.route('/photo_del')
+def photo_del():
+    pid = request.args.get('pid')
+    photo = Photo.query.get(pid)
+    filename = photo.photo_name
+    # 封装好的一个删除七牛存储文件的函数
+    info = delete_qiniu(filename)
+    # 判断状态码
+    if info.status_code == 200:
+        # 删除数据库的内容
+        db.session.delete(photo)
+        db.session.commit()
+        return redirect(url_for('user1.user_center'))
+    else:
+        return render_template('500.html', err_msg='删除相册图片失败！')
     
-    # photos = Photo.query.all()
-    # return render_template('user/myphoto.html', photos=photos)
+    
+@user_bp1.route('/error')
+def test_error():
+    # print(request.headers)
+    # print(request.headers.get('Accept-Encoding'))
+    referer = request.headers.get('Referer', None)
+    return render_template('500.html', err_msg='有误', referer=referer)
