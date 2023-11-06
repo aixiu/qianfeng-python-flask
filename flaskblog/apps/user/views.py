@@ -13,7 +13,7 @@ from apps.utils.util import delete_qiniu, upload_qiniu
 # url_prefix='/user'  路由变为 http://127.0.0.1/user/XXXX
 user_bp1 = Blueprint('user1', __name__, url_prefix='/user') 
 
-required_login_list = ['/user/center', '/user/change', '/article/publish', '/user/upload_photo', '/user/photo_del'] 
+required_login_list = ['/user/center', '/user/change', '/article/publish', '/user/upload_photo', '/user/photo_del', '/article/add_comment']
 
 # ****重点*****
 # 通过勾子函数来过滤指定页面，没登录则限制，有登录则放行
@@ -21,7 +21,7 @@ required_login_list = ['/user/center', '/user/change', '/article/publish', '/use
 def before_request():
     print('before_requestbefore_request', request.path)
     if request.path in required_login_list:
-        id = session.get('uid')
+        id = session.get('uid', None)
         if not id:
             return render_template('user/login1.html')
         else:
@@ -57,7 +57,7 @@ def index():
     # uid = request.cookies.get('uid', None)
     
     # 2、session的获取,session底层默认获取
-    uid = session.get('uid')
+    uid = session.get('uid', None)
     
     # 获取文章列表
     # articles = Article.query.order_by(Article.pdatetime.desc()).all()   # 默认是正序，  .asc()正序  .desc()倒序
@@ -312,7 +312,7 @@ def myphoto():
     # 获取文章分类
     types = Article_type.query.all()
     
-    user_id = session['uid']
+    user_id = session.get('uid', None)
     user = None
     if user_id:
         user = User.query.get(user_id)

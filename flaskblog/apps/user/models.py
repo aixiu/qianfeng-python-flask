@@ -33,6 +33,7 @@ class User(db.Model):
     #增加一个字段 ，以及反向引用
     articles = db.relationship('Article', backref ='user' )#这块是给模板用的，不在数据库里体现，但是模板里边可以引用   Article 模型名
     # relationship 是给模板使用的，ForeignKey是做映射使用的
+    comments = db.relationship('Comment', backref='user')
     
     def __str__(self):
         return self.username

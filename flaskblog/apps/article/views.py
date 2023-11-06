@@ -1,6 +1,6 @@
 from flask import Blueprint, g, jsonify, redirect, render_template, request, session, url_for
 from apps.user.models import User
-from apps.article.models import Article, Article_type
+from apps.article.models import Article, Article_type, Comment
 from exts import db
 
 article_bp1 = Blueprint('article1', __name__, url_prefix='/article')
@@ -12,7 +12,7 @@ def content_decode(content):
     # content = content.decode('utf-8')
     return f'{content}'
 
-# 添加文章
+# 发表文章
 @article_bp1.route('/publish', methods=['POST', 'GET'])
 def publish_article():
     if request.method == 'POST':
@@ -31,7 +31,8 @@ def publish_article():
         db.session.commit()
         
         return redirect(url_for('user1.index'))
-    
+
+# 文章详情   
 @article_bp1.route('/detail')
 def article_detail():
     # 获取文章对象通过id
@@ -39,13 +40,16 @@ def article_detail():
     article = Article.query.get(article_id)
     # 获取文章分类
     types = Article_type.query.all()
-    
-    user_id = session['uid']
+    # 登录用户    
+    user_id = session.get('uid', None)
     user = None
     if user_id:
         user = User.query.get(user_id)
+    # 单独查询评论
+    page = int(request.args.get('page', 1))
+    comments = Comment.query.filter(Comment.article_id == article_id).order_by(Comment.cdatetime.desc()).paginate(page=page, per_page=5)  # 默认是正序，  .asc()正序  .desc()倒序
 
-    return render_template('article/detail.html', article=article, types=types, user=user)
+    return render_template('article/detail.html', article=article, types=types, user=user, comments=comments)
 
 @article_bp1.route('/love')
 def article_love():
@@ -59,3 +63,23 @@ def article_love():
         article.love_num += 1
     db.session.commit()
     return jsonify(num=article.love_num)
+
+# 发表文章评论
+@article_bp1.route('/add_comment', methods=['GET', 'POST'])
+def article_comment():
+    if request.method == 'POST':
+        comment_content = request.form.get('comment')
+        user_id = g.user.id
+        article_id = request.form.get('aid')
+        
+        # 评论模型
+        comment = Comment()
+        comment.comment = comment_content
+        comment.user_id = user_id
+        comment.article_id = article_id
+        db.session.add(comment)
+        db.session.commit()
+
+        # return redirect(url_for('article1.article_detail') + "?aid=" + article_id)
+        return redirect(f"{url_for('article1.article_detail')}?aid={article_id}")
+    return redirect(url_for('user1.index'))
