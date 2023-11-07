@@ -1,7 +1,7 @@
 import os
 from flask import Blueprint, jsonify, redirect, render_template, request, session, url_for, g
 from apps.article.models import Article, Article_type
-from apps.user.models import User, Photo   # 蓝图相关
+from apps.user.models import AboutMe, MessageBoard, User, Photo   # 蓝图相关
 from exts import db
 from werkzeug.security import generate_password_hash, check_password_hash
 from apps.user.smssend import SmsSendAPIDemo
@@ -13,7 +13,7 @@ from apps.utils.util import delete_qiniu, upload_qiniu
 # url_prefix='/user'  路由变为 http://127.0.0.1/user/XXXX
 user_bp1 = Blueprint('user1', __name__, url_prefix='/user') 
 
-required_login_list = ['/user/center', '/user/change', '/article/publish', '/user/upload_photo', '/user/photo_del', '/article/add_comment']
+required_login_list = ['/user/center', '/user/change', '/article/publish', '/user/upload_photo', '/user/photo_del', '/article/add_comment', '/user/aboutme', '/user/showabout']
 
 # ****重点*****
 # 通过勾子函数来过滤指定页面，没登录则限制，有登录则放行
@@ -42,13 +42,19 @@ def teardown_request_test(response):
     return response
 
 # 自定义过滤器  python3 字符串默认是Unicode编码，不再需要进行解码操作
-@user_bp1.app_template_filter('cdecode')
+@user_bp1.app_template_filter('decodetest')
 def content_decode(content):
     # content = content.decode('utf-8')
     # if len(content) >= 200:
     #     return f'{content[:200]}......'
     # else:
-        return f'{content}'
+        return f'{content}' 
+    
+    
+@user_bp1.app_template_filter('cdecode1')
+def content_decode1(content):
+    content = content.decode('utf-8')
+    return content
 
 # 首页
 @user_bp1.route('/')
@@ -305,8 +311,10 @@ def upload_photo():
 # 我的相册 
 @user_bp1.route('/myphoto')
 def myphoto():
+    # 如果不转成整型，默认是str类型
     page = int(request.args.get('page', 1))
     # 分页操作
+    # photos是一个pagination类型
     photos = Photo.query.paginate(page=page, per_page=2)
     
     # 获取文章分类
@@ -334,6 +342,72 @@ def photo_del():
         return redirect(url_for('user1.user_center'))
     else:
         return render_template('500.html', err_msg='删除相册图片失败！')
+    
+
+# 关于用户介绍添加
+@user_bp1.route('/aboutme', methods=['GET', 'POST'])
+def about_me():
+    content = request.form.get('about')
+    # 添加信息
+    try:
+        aboutme = AboutMe()
+        aboutme.content = content.encode('utf-8')
+        aboutme.user_id = g.user.id
+        db.session.add(aboutme)
+        db.session.commit()
+    except Exception as err:
+        return redirect(url_for('user1.user_center'))
+    else:
+        return render_template('user/aboutme.html', user=g.user)
+
+
+# 展示关于我
+@user_bp1.route('/showabout')
+def show_about():
+    # 获取文章分类
+    types = Article_type.query.all()
+    return render_template('user/aboutme.html', user=g.user, types=types)
+
+
+# 留言板
+@user_bp1.route('/board', methods=['GET', 'POST'])
+def show_board():
+    # 获取文章分类
+    types = Article_type.query.all()
+    # 获取登录用户信息
+    uid = session.get('uid', None)
+    user = None
+    if uid:
+        user = User.query.get(uid)
+
+    # 查询所有的留言内容
+    page = int(request.args.get('page', 1))
+    boards = MessageBoard.query.order_by(MessageBoard.mdatetime.desc()).paginate(page=page, per_page=5)
+    # 判断请求方式
+    if request.method == 'POST':
+        content = request.form.get('board')
+        print('======》', content)
+        # 添加留言
+        msg_board = MessageBoard()
+        msg_board.content = content
+        if uid:
+            msg_board.user_id = uid
+        db.session.add(msg_board)
+        db.session.commit()
+        return redirect(url_for('user1.show_board'))
+    return render_template('user/board.html', user=user, boards=boards, types=types)
+
+
+# 留言删除
+@user_bp1.route('/board_del')
+def delete_board():
+    bid = request.args.get('bid')
+    if bid:
+        msgboard = MessageBoard.query.get(bid)
+        db.session.delete(msgboard)
+        db.session.commit()
+        return redirect(url_for('user.user_center'))
+
     
     
 @user_bp1.route('/error')

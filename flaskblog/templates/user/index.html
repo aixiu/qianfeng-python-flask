@@ -51,9 +51,9 @@
                     <br>
                     <div>
                         {% if article.content|length >= 200 %}
-                            {{ '%s''%s'| format(article.content[:200],'......') | cdecode | safe }}
+                            {{ '%s''%s'| format(article.content[:200],'......') | decodetest | safe }}
                         {% else %}
-                            {{ '%s'| format(article.content) | cdecode | safe }}
+                            {{ '%s'| format(article.content) | decodetest | safe }}
                         {% endif %}
                     </div>   <!-- 这是因为 “| safe” 过滤器告诉 jinja2 不要转义 message 变量中的 HTML 代码，而是将其作为原始 HTML 输出。 -->
                 </p>

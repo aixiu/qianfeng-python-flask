@@ -48,3 +48,20 @@ class Photo(db.Model):
 
     def __str__(self):
         return self.photo_name
+    
+class AboutMe(db.Model):
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    content = db.Column(db.BLOB, nullable=False)
+    pdatetime = db.Column(db.DateTime, default=datetime.now)
+    # 要与用户建立联系
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), unique=True)
+    user = db.relationship('User', backref='about')
+
+
+class MessageBoard(db.Model):
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    content = db.Column(db.String(255), nullable=False)
+    mdatetime = db.Column(db.DateTime, default=datetime.now)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    # 关系：
+    user = db.relationship('User', backref='messages')
