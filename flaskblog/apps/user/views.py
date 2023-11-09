@@ -8,6 +8,7 @@ from apps.user.smssend import SmsSendAPIDemo
 from werkzeug.utils import secure_filename
 from setting import Config
 from apps.utils.util import delete_qiniu, upload_qiniu
+from apps.utils.util import user_type
 
 # 创建一个蓝图名为 user1 在当前文件定义就写 __name__  
 # url_prefix='/user'  路由变为 http://127.0.0.1/user/XXXX
@@ -59,39 +60,42 @@ def content_decode1(content):
 # 首页
 @user_bp1.route('/')
 def index():
-    # 1、cookie获取方式
+    # 1。cookie获取方式
     # uid = request.cookies.get('uid', None)
-    
-    # 2、session的获取,session底层默认获取
-    uid = session.get('uid', None)
-    
+    # 2。session的获取,session底层默认获取
+    # 2。session的方式：uid = session.get('uid')
     # 获取文章列表
     # articles = Article.query.order_by(Article.pdatetime.desc()).all()   # 默认是正序，  .asc()正序  .desc()倒序
-    
-    
-    # 获取文章列表   7 6 5  |  4 3 2 | 1
+    user, types = user_type()
     # 接收页码数
     page = int(request.args.get('page', 1))
-    pagination = Article.query.order_by(Article.pdatetime.desc()).paginate(page=page, per_page=3)  # paginate分页， page 页码，per_page每页显示3篇
-    
-    print(pagination.items)  # [<Article 4>, <Article 3>, <Article 2>]
-    print(pagination.page)  # 当前的页码数
-    print(pagination.prev_num)  # 当前页的前一个页码数
-    print(pagination.next_num)  # 当前页的后一页的页码数
-    print(pagination.has_next)  # True  有没有上一页
-    print(pagination.has_prev)  # True  有没有下一页
-    print(pagination.pages)  # 总共有几页
-    print(pagination.total)  # 总的记录条数
-
-    # 获取分类列表
-    types = Article_type.query.all()
-    
-    # 判断用户是否登录    
-    if uid:
-        user = User.query.get(uid)
-        return render_template('user/index.html', user=user, types=types, pagination=pagination)
+    # 判断是否存在检索词汇
+    search = request.args.get('search', '')
+    # 有检索词汇
+    if search:
+        # 进行检索contains
+        pagination = Article.query.filter(Article.title.contains(search)).order_by(Article.pdatetime.desc()).paginate(page=page, per_page=3)  # paginate分页， page 页码，per_page每页显示3篇
+        
+        # print(pagination.items)  # [<Article 4>, <Article 3>, <Article 2>]
+        # print(pagination.page)  # 当前的页码数
+        # print(pagination.prev_num)  # 当前页的前一个页码数
+        # print(pagination.next_num)  # 当前页的后一页的页码数
+        # print(pagination.has_next)  # True  有没有上一页
+        # print(pagination.has_prev)  # True  有没有下一页
+        # print(pagination.pages)  # 总共有几页
+        # print(pagination.total)  # 总的记录条数
+        
     else:
-        return render_template('user/index.html', types=types, pagination=pagination)
+        # 获取文章列表   7 6 5  |  4 3 2 | 1
+        pagination = Article.query.order_by(Article.pdatetime.desc()).paginate(page=page, per_page=3)
+
+    params = {
+        'user': user,
+        'types': types,
+        'pagination': pagination,
+        'search': search
+    }
+    return render_template('user/index.html', **params)
 
 # 用户注册
 @user_bp1.route('/register', methods=['GET', 'POST'])
@@ -406,7 +410,7 @@ def delete_board():
         msgboard = MessageBoard.query.get(bid)
         db.session.delete(msgboard)
         db.session.commit()
-        return redirect(url_for('user.user_center'))
+        return redirect(url_for('user1.user_center'))
 
     
     

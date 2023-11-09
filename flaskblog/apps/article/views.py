@@ -2,6 +2,7 @@ from flask import Blueprint, g, jsonify, redirect, render_template, request, ses
 from apps.user.models import User
 from apps.article.models import Article, Article_type, Comment
 from exts import db
+from apps.utils.util import user_type
 
 article_bp1 = Blueprint('article1', __name__, url_prefix='/article')
 
@@ -38,13 +39,11 @@ def article_detail():
     # 获取文章对象通过id
     article_id = request.args.get('aid')
     article = Article.query.get(article_id)
-    # 获取文章分类
-    types = Article_type.query.all()
-    # 登录用户    
-    user_id = session.get('uid', None)
-    user = None
-    if user_id:
-        user = User.query.get(user_id)
+    # 点击量变化
+    article.click_num += 1
+    db.session.commit()
+    # 获取用户和文章类型给导航使用
+    user, types = user_type()
     # 单独查询评论
     page = int(request.args.get('page', 1))
     comments = Comment.query.filter(Comment.article_id == article_id).order_by(Comment.cdatetime.desc()).paginate(page=page, per_page=5)  # 默认是正序，  .asc()正序  .desc()倒序
@@ -83,3 +82,27 @@ def article_comment():
         # return redirect(url_for('article1.article_detail') + "?aid=" + article_id)
         return redirect(f"{url_for('article1.article_detail')}?aid={article_id}")
     return redirect(url_for('user1.index'))
+
+
+# 文章分类检索
+@article_bp1.route('/type_search')
+def type_search():
+    # 获取用户和文章类型给导航使用
+    user, types = user_type()
+
+    # tid的获取
+    tid = request.args.get('tid', 1)
+    page = int(request.args.get('page', 1))
+
+    # 分页器？？？？
+    # pagination对象
+    articles = Article.query.filter(Article.type_id == tid).paginate(page=page, per_page=3)
+
+    params = {
+        'user': user,
+        'types': types,
+        'articles': articles,
+        'tid': tid,
+    }
+
+    return render_template('article/article_type.html', **params)
